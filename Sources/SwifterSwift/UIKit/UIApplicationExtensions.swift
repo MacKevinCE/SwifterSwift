@@ -65,6 +65,15 @@ public extension UIApplication {
     }
 }
 
+// MARK: - Package
+
+public extension UIApplication {
+    var rootViewController: UIViewController? {
+        windows.last?.rootViewController
+    }
+}
+
+
 #endif
 
 #endif

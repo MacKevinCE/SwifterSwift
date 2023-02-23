@@ -1834,4 +1834,14 @@ public extension SFColor {
 
     // swiftlint:enable type_body_length
 }
+
+// MARK: - Package
+
+public extension SFColor {
+    func setAlpha(_ alpha: CGFloat) -> SFColor {
+        let components = cgFloatComponents
+        return SFColor(red: components.red, green: components.green, blue: components.blue, alpha: alpha)
+    }
+}
+
 #endif

@@ -150,3 +150,11 @@ public extension Array where Element: Equatable {
         return filter { set.insert($0[keyPath: path]).inserted }
     }
 }
+
+// MARK: - Package
+
+public extension Array {
+    func firstType<T>() -> T? {
+        first(where: { ($0 as? T) != nil }) as? T
+    }
+}

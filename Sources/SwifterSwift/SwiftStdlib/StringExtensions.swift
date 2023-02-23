@@ -259,6 +259,12 @@ public extension String {
         scanner.locale = NSLocale.current
         #if os(Linux) || targetEnvironment(macCatalyst)
         return scanner.scanDecimal() != nil && scanner.isAtEnd
+        #elseif os(iOS)
+        if #available(iOS 13.0, *) {
+            return scanner.scanDecimal() != nil && scanner.isAtEnd
+        } else {
+            return scanner.scanDecimal(nil) && scanner.isAtEnd
+        }
         #else
         return scanner.scanDecimal(nil) && scanner.isAtEnd
         #endif
@@ -629,7 +635,9 @@ public extension String {
             return nil
         }
 
-        return String(self[range])
+        let startIndex = self.index(self.startIndex, offsetBy: range.lowerBound)
+        let endIndex = self.index(self.startIndex, offsetBy: range.upperBound)
+        return String(self[startIndex..<endIndex])
     }
 
     /// SwifterSwift: Safely subscript string within a given range.
@@ -643,8 +651,10 @@ public extension String {
               range.upperBound < count else {
             return nil
         }
-
-        return String(self[range])
+        
+        let startIndex = self.index(self.startIndex, offsetBy: range.lowerBound)
+        let endIndex = self.index(self.startIndex, offsetBy: range.upperBound + 1)
+        return String(self[startIndex..<endIndex])
     }
 
     /// SwifterSwift: Safely subscript string within a given range.
@@ -659,7 +669,8 @@ public extension String {
             return nil
         }
 
-        return String(self[range])
+        let endIndex = self.index(self.startIndex, offsetBy: range.upperBound)
+        return String(self[self.startIndex..<endIndex])
     }
 
     /// SwifterSwift: Safely subscript string within a given range.
@@ -674,7 +685,8 @@ public extension String {
             return nil
         }
 
-        return String(self[range])
+        let endIndex = self.index(self.startIndex, offsetBy: range.upperBound + 1)
+        return String(self[self.startIndex..<endIndex])
     }
 
     /// SwifterSwift: Safely subscript string within a given range.
@@ -689,7 +701,8 @@ public extension String {
             return nil
         }
 
-        return String(self[range])
+        let startIndex = self.index(self.startIndex, offsetBy: range.lowerBound)
+        return String(self[startIndex...])
     }
 
     #if os(iOS) || os(macOS)
@@ -1373,6 +1386,27 @@ public extension String {
     subscript(bounds: NSRange) -> Substring {
         guard let range = Range(bounds, in: self) else { fatalError("Failed to find range \(bounds) in \(self)") }
         return self[range]
+    }
+}
+
+// MARK: - Package
+
+public extension String {
+    var nullable: String? { isEmpty ? nil : self }
+
+    var unaccent: String {
+        let parts = components(separatedBy: "ñ").map { p in p.folding(options: .diacriticInsensitive, locale: .current) }
+        return parts.joined(separator: "ñ")
+    }
+
+    func truncated(prefixLength: Int, suffixLength: Int, trailing: String? = "...") -> String {
+        if count > (prefixLength + suffixLength) {
+            let pre = prefix(prefixLength)
+            let post = suffix(suffixLength)
+            return "\(pre)\(trailing ?? "")\(post)"
+        } else {
+            return self
+        }
     }
 }
 

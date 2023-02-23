@@ -203,4 +203,169 @@ public extension Array where Element: NSAttributedString {
         }
     }
 }
+
+// MARK: - Package
+
+public extension NSMutableAttributedString {
+    @discardableResult
+    func applying(attributes: [NSAttributedString.Key: Any], range: NSRange) -> NSMutableAttributedString {
+        addAttributes(attributes, range: range)
+        return self
+    }
+
+    @discardableResult
+    func colored(with color: SFColor, range: NSRange) -> NSMutableAttributedString {
+        applying(attributes: [.foregroundColor: color], range: range)
+    }
+
+    @discardableResult
+    func backgroundColored(with backgroundColor: SFColor, range: NSRange) -> NSMutableAttributedString {
+        applying(attributes: [.backgroundColor: backgroundColor], range: range)
+    }
+
+    @discardableResult
+    func fonted(with font: SFFont, range: NSRange) -> NSMutableAttributedString {
+        applying(attributes: [.font: font], range: range)
+    }
+
+    @discardableResult
+    func underlined(range: NSRange) -> NSMutableAttributedString {
+        applying(attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue], range: range)
+    }
+
+    @discardableResult
+    func struckthrough(range: NSRange) -> NSMutableAttributedString {
+        applying(attributes: [.strikethroughStyle: NSNumber(value: NSUnderlineStyle.single.rawValue as Int)], range: range)
+    }
+
+    @discardableResult
+    func indented(with indentation: CGFloat, range: NSRange) -> NSMutableAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        let nonOptions = [NSTextTab.OptionKey: Any]()
+        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: nonOptions)]
+        paragraphStyle.defaultTabInterval = indentation
+        paragraphStyle.headIndent = indentation
+        return applying(attributes: [.paragraphStyle: paragraphStyle], range: range)
+    }
+
+    @discardableResult
+    func applying(range: NSRange, font: SFFont? = nil, color: SFColor? = nil, backgroundColor: SFColor? = nil, indentation: CGFloat? = nil, isUnderline: Bool = false, isStruckthrough: Bool = false) -> NSMutableAttributedString {
+        if let font = font {
+            fonted(with: font, range: range)
+        }
+        if let color = color {
+            colored(with: color, range: range)
+        }
+        if let backgroundColor = backgroundColor {
+            backgroundColored(with: backgroundColor, range: range)
+        }
+        if let indentation = indentation {
+            indented(with: indentation, range: range)
+        }
+        if isUnderline {
+            underlined(range: range)
+        }
+        if isStruckthrough {
+            struckthrough(range: range)
+        }
+        return self
+    }
+
+    @discardableResult
+    func applying(ranges: [NSRange], font: SFFont? = nil, color: SFColor? = nil, backgroundColor: SFColor? = nil, indentation: CGFloat? = nil, isUnderline: Bool = false, isStruckthrough: Bool = false) -> NSMutableAttributedString {
+        ranges.forEach {
+            applying(range: $0, font: font, color: color, backgroundColor: backgroundColor, indentation: indentation, isUnderline: isUnderline, isStruckthrough: isStruckthrough)
+        }
+        return self
+    }
+
+    @discardableResult
+    func applying(font: SFFont? = nil, color: SFColor? = nil, backgroundColor: SFColor? = nil, indentation: CGFloat? = nil, isUnderline: Bool = false, isStruckthrough: Bool = false) -> NSMutableAttributedString {
+        let range = (string as NSString).range(of: string)
+        return applying(range: range, font: font, color: color, backgroundColor: backgroundColor, indentation: indentation, isUnderline: isUnderline, isStruckthrough: isStruckthrough)
+    }
+
+    @available(iOS 16.0, *)
+    @discardableResult
+    func applying(toOccurrencesOf textFind: String, font: SFFont? = nil, color: SFColor? = nil, backgroundColor: SFColor? = nil, indentation: CGFloat? = nil, isUnderline: Bool = false, isStruckthrough: Bool = false) -> NSMutableAttributedString {
+        if textFind != "" {
+            let ranges = string.ranges(of: textFind)
+            applying(ranges: ranges, font: font, color: color, backgroundColor: backgroundColor, indentation: indentation, isUnderline: isUnderline, isStruckthrough: isStruckthrough)
+        }
+        return self
+    }
+
+    @discardableResult
+    func applying(textFind: String, font: SFFont? = nil, color: SFColor? = nil, backgroundColor: SFColor? = nil, indentation: CGFloat? = nil, isUnderline: Bool = false, isStruckthrough: Bool = false) -> NSMutableAttributedString {
+        if textFind != "" {
+            let range = (string as NSString).range(of: textFind)
+            applying(range: range, font: font, color: color, backgroundColor: backgroundColor, indentation: indentation, isUnderline: isUnderline, isStruckthrough: isStruckthrough)
+        }
+        return self
+    }
+
+    @discardableResult
+    func addTextApplying(text: String, font: SFFont? = nil, color: SFColor? = nil, backgroundColor: SFColor? = nil, indentation: CGFloat? = nil, isUnderline: Bool = false, isStruckthrough: Bool = false) -> NSMutableAttributedString {
+        if text != "" {
+            let attributedString = text.applying(font: font, color: color, backgroundColor: backgroundColor, indentation: indentation, isUnderline: isUnderline, isStruckthrough: isStruckthrough)
+            append(attributedString)
+        }
+        return self
+    }
+}
+
+public extension String {
+    func applying(attributes: [NSAttributedString.Key: Any]) -> NSMutableAttributedString {
+        NSMutableAttributedString(string: self, attributes: attributes)
+    }
+
+    func colored(with color: SFColor) -> NSMutableAttributedString {
+        applying(attributes: [.foregroundColor: color])
+    }
+
+    func backgroundColored(with backgroundColor: SFColor) -> NSMutableAttributedString {
+        applying(attributes: [.backgroundColor: backgroundColor])
+    }
+
+    func fonted(with font: SFFont) -> NSMutableAttributedString {
+        applying(attributes: [.font: font])
+    }
+
+    func underlined() -> NSMutableAttributedString {
+        applying(attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue])
+    }
+
+    func struckthrough() -> NSMutableAttributedString {
+        applying(attributes: [.strikethroughStyle: NSNumber(value: NSUnderlineStyle.single.rawValue as Int)])
+    }
+
+    func indented(with indentation: CGFloat) -> NSMutableAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        let nonOptions = [NSTextTab.OptionKey: Any]()
+        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: nonOptions)]
+        paragraphStyle.defaultTabInterval = indentation
+        paragraphStyle.headIndent = indentation
+        return applying(attributes: [.paragraphStyle: paragraphStyle])
+    }
+
+    func applying(font: SFFont? = nil, color: SFColor? = nil, backgroundColor: SFColor? = nil, indentation: CGFloat? = nil, isUnderline: Bool = false, isStruckthrough: Bool = false) -> NSMutableAttributedString {
+        NSMutableAttributedString(string: self).applying(font: font, color: color, backgroundColor: backgroundColor, indentation: indentation, isUnderline: isUnderline, isStruckthrough: isStruckthrough)
+    }
+    
+    func ranges(of textFind: String, options mask: NSString.CompareOptions = []) -> [NSRange] {
+        var ranges: [NSRange] = []
+
+        var range = NSRange(location: 0, length: count)
+        while range.location != NSNotFound {
+            range = NSMutableString(string: self).range(of: textFind, options: mask, range: range)
+            if range.location != NSNotFound {
+                ranges.append(range)
+                let location = range.location + range.length
+                range = NSRange(location: location, length: count - location)
+            }
+        }
+        return ranges
+    }
+}
+
 #endif

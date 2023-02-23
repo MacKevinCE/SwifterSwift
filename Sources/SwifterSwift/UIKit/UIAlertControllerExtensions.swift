@@ -20,10 +20,27 @@ public extension UIAlertController {
     func show(animated: Bool = true, vibrate: Bool = false, completion: (() -> Void)? = nil) {
         #if targetEnvironment(macCatalyst)
         let window = UIApplication.shared.windows.last
+        window?.rootViewController?.present(self, animated: animated, completion: completion)
+        #elseif os(iOS)
+            #if swift(>=5.3)
+            if #available(iOS 13.0, *) {
+                let windowScene = UIApplication.shared.connectedScenes
+                        .compactMap { $0 as? UIWindowScene }
+                        .first { $0.activationState == .foregroundActive }
+                let window = windowScene?.windows.first
+                window?.rootViewController?.present(self, animated: animated, completion: completion)
+            } else {
+                let window = UIApplication.shared.keyWindow
+                window?.rootViewController?.present(self, animated: animated, completion: completion)
+            }
+            #else
+            let window = UIApplication.shared.keyWindow
+            window?.rootViewController?.present(self, animated: animated, completion: completion)
+            #endif
         #else
         let window = UIApplication.shared.keyWindow
-        #endif
         window?.rootViewController?.present(self, animated: animated, completion: completion)
+        #endif
         if vibrate {
             #if canImport(AudioToolbox)
             AudioServicesPlayAlertSound(kSystemSoundID_Vibrate)

@@ -146,4 +146,16 @@ public extension UIViewController {
     #endif
 }
 
+// MARK: - Package
+
+public extension UIViewController {
+    static func instantiatedFromStoryboard() -> Self {
+        let storyboard = UIStoryboard(name: String(describing: Self.self), bundle: Bundle.main)
+        guard let view = storyboard.instantiateInitialViewController() as? Self else {
+            fatalError()
+        }
+        return view
+    }
+}
+
 #endif

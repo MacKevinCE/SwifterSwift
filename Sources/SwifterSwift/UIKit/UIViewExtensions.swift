@@ -70,7 +70,7 @@ public extension UIView {
 
 public extension UIView {
     /// SwifterSwift: Border color of view; also inspectable from Storyboard.
-    @IBInspectable var layerBorderColor: UIColor? {
+    var layerBorderColor: UIColor? {
         get {
             guard let color = layer.borderColor else { return nil }
             return UIColor(cgColor: color)
@@ -87,7 +87,7 @@ public extension UIView {
     }
 
     /// SwifterSwift: Border width of view; also inspectable from Storyboard.
-    @IBInspectable var layerBorderWidth: CGFloat {
+    var layerBorderWidth: CGFloat {
         get {
             return layer.borderWidth
         }
@@ -97,7 +97,7 @@ public extension UIView {
     }
 
     /// SwifterSwift: Corner radius of view; also inspectable from Storyboard.
-    @IBInspectable var layerCornerRadius: CGFloat {
+    var layerCornerRadius: CGFloat {
         get {
             return layer.cornerRadius
         }
@@ -138,7 +138,7 @@ public extension UIView {
     }
 
     /// SwifterSwift: Shadow color of view; also inspectable from Storyboard.
-    @IBInspectable var layerShadowColor: UIColor? {
+    var layerShadowColor: UIColor? {
         get {
             guard let color = layer.shadowColor else { return nil }
             return UIColor(cgColor: color)
@@ -149,7 +149,7 @@ public extension UIView {
     }
 
     /// SwifterSwift: Shadow offset of view; also inspectable from Storyboard.
-    @IBInspectable var layerShadowOffset: CGSize {
+    var layerShadowOffset: CGSize {
         get {
             return layer.shadowOffset
         }
@@ -159,7 +159,7 @@ public extension UIView {
     }
 
     /// SwifterSwift: Shadow opacity of view; also inspectable from Storyboard.
-    @IBInspectable var layerShadowOpacity: Float {
+    var layerShadowOpacity: Float {
         get {
             return layer.shadowOpacity
         }
@@ -169,7 +169,7 @@ public extension UIView {
     }
 
     /// SwifterSwift: Shadow radius of view; also inspectable from Storyboard.
-    @IBInspectable var layerShadowRadius: CGFloat {
+    var layerShadowRadius: CGFloat {
         get {
             return layer.shadowRadius
         }
@@ -179,7 +179,7 @@ public extension UIView {
     }
 
     /// SwifterSwift: Masks to bounds of view; also inspectable from Storyboard.
-    @IBInspectable var masksToBounds: Bool {
+    var masksToBounds: Bool {
         get {
             return layer.masksToBounds
         }
@@ -715,6 +715,37 @@ public extension UIView {
     /// SwifterSwift: First bottom constraint for this view.
     var bottomConstraint: NSLayoutConstraint? {
         findConstraint(attribute: .bottom, for: self)
+    }
+}
+
+// MARK: - Package
+
+public extension UIView {
+    func getImagenWithText(text: String, weight: UIFont.Weight = .regular, textColor: UIColor = .black, backgroundColor: UIColor = UIColor.clear, borderWidth: CGFloat = 0, borderColor: UIColor = UIColor.clear) -> UIImage? {
+        let size = bounds.size
+
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = NSTextAlignment.center
+
+        let fontSize = min(size.width, size.height)
+
+        // stroke width expects a whole number percentage of the font size
+        let strokeWidth: CGFloat = fontSize == 0 ? 0 : (-100 * borderWidth / fontSize)
+        let attributedString = NSAttributedString(string: text.description, attributes: [
+            NSAttributedString.Key.font: UIFont.systemFont(ofSize: fontSize, weight: weight),
+            NSAttributedString.Key.foregroundColor: textColor,
+            NSAttributedString.Key.backgroundColor: backgroundColor,
+            NSAttributedString.Key.paragraphStyle: paragraph,
+            NSAttributedString.Key.strokeWidth: strokeWidth,
+            NSAttributedString.Key.strokeColor: borderColor,
+        ])
+
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+        let rect = CGRect(x: -8, y: -8, width: 17, height: 17)
+        attributedString.draw(in: CGRect(x: 0 + rect.origin.x, y: ((size.height - fontSize) / 2) + rect.origin.y, width: size.width + rect.size.width, height: fontSize + rect.size.height))
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
     }
 }
 

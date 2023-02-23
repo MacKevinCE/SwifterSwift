@@ -45,4 +45,8 @@ public extension StringProtocol {
             range: searchRange)
     }
     #endif
+    
+    // MARK: - Package
+
+    static var empty: Self { "" }
 }
